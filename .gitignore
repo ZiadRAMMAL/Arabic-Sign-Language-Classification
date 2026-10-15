@@ -1,0 +1,17 @@
+# Environnement virtuel Python
+venv/
+.venv/
+env/
+
+# Fichiers Python / Bytecode
+__pycache__/
+*.pyc
+
+# Modèles lourds Keras / TensorFlow (gérés via Google Drive)
+*.h5
+*.json
+
+# Fichiers temporaires Streamlit et VS Code
+.streamlit/
+.vscode/
+.DS_Store

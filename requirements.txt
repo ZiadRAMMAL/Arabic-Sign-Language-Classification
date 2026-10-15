@@ -1,0 +1,7 @@
+streamlit
+opencv-python-headles
+pillow
+numpy
+pandas
+mediapipe
+tensorflow-cpu
