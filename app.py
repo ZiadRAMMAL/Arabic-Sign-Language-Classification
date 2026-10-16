@@ -118,6 +118,7 @@ def load_trained_model():
         # Affichage détaillé de l'erreur dans la console/UI pour faciliter le débogage
         st.error(f"Erreur modèle : {e}")
         return None
+model = load_trained_model()
 
 # --- 2. TRAITEMENT ---
 
@@ -175,7 +176,7 @@ if img_file:
         col_img, col_act = st.columns([1, 1])
         
         with col_img:
-            st.image(img_display, caption="Signe détecté", use_container_width=True)
+            st.image(img_display, caption="Signe détecté", width="stretch")
             
         with col_act:
             if model is not None:
