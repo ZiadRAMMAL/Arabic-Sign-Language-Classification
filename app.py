@@ -22,6 +22,17 @@ from mediapipe.tasks.python import vision
 import os
 import gdown
 
+from mediapipe.tasks.python import BaseOptions
+from mediapipe.tasks.python.vision import HandLandmarker, HandLandmarkerOptions, RunningMode
+
+options = HandLandmarkerOptions(
+    base_options=BaseOptions(
+        model_asset_path="path/to/hand_landmarker.task",
+        delegate=BaseOptions.Delegate.CPU  # <-- Explicitly set CPU delegate
+    ),
+    running_mode=RunningMode.IMAGE
+)
+
 # Function to download models from Google Drive if not present locally
 @st.cache_resource
 def download_model_files():
