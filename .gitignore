@@ -9,7 +9,7 @@ __pycache__/
 
 # Modèles lourds Keras / TensorFlow (gérés via Google Drive)
 *.h5
-*.json
+
 
 # Fichiers temporaires Streamlit et VS Code
 .streamlit/
