@@ -99,10 +99,11 @@ def load_trained_model():
         with open('model.json', 'r') as json_file:
             loaded_model_json = json_file.read()
             
-        # Classe Flatten personnalisée pour gérer le format d'arguments Keras 2 / Keras 3
+        # Classe Flatten adaptée pour dépaqueter récursivement les arguments sous forme de liste
         class FixedFlatten(tf.keras.layers.Flatten):
             def call(self, inputs, *args, **kwargs):
-                if isinstance(inputs, list) and len(inputs) == 1:
+                # Extraire le tensor sous-jacent s'il est enveloppé dans une liste ou un tuple
+                while isinstance(inputs, (list, tuple)) and len(inputs) > 0:
                     inputs = inputs[0]
                 return super().call(inputs, *args, **kwargs)
 
@@ -112,7 +113,7 @@ def load_trained_model():
             'InputLayer': tf.keras.layers.InputLayer,
             'Conv2D': tf.keras.layers.Conv2D,
             'MaxPooling2D': tf.keras.layers.MaxPooling2D,
-            'Flatten': FixedFlatten,  # <-- Utilisation de notre Flatten corrigé
+            'Flatten': FixedFlatten,
             'Dense': tf.keras.layers.Dense
         }
         
