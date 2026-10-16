@@ -19,6 +19,29 @@ import tensorflow as tf
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
+import os
+import gdown
+
+# Function to download models from Google Drive if not present locally
+@st.cache_resource
+def download_model_files():
+    h5_file_id = "1KFUQ7b4LW7HGwr2eHirdWAIgTmGKxoxj"
+    json_file_id = "1jX7dpkWKsh6hP2tWgeiOnLmy4Xr-_Jt8"
+    
+    h5_url = f"https://drive.google.com/uc?id={h5_file_id}"
+    json_url = f"https://drive.google.com/uc?id={json_file_id}"
+    
+    if not os.path.exists("model.h5"):
+        with st.spinner("Downloading model weight file (model.h5)..."):
+            gdown.download(h5_url, "model.h5", quiet=False)
+            
+    if not os.path.exists("model.json"):
+        with st.spinner("Downloading model structure file (model.json)..."):
+            gdown.download(json_url, "model.json", quiet=False)
+
+# Execute the download before loading the model
+download_model_files()
+
 # --- 1. INITIALISATION ET MÉMOIRE ---
 
 if 'phrase' not in st.session_state:
