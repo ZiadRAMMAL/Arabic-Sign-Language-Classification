@@ -6,3 +6,4 @@ pandas
 mediapipe
 tensorflow-cpu
 gdown
+tf-keras

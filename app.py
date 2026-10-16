@@ -26,6 +26,8 @@ import gdown
 from mediapipe.tasks.python import BaseOptions
 from mediapipe.tasks.python.vision import HandLandmarker, HandLandmarkerOptions, RunningMode
 
+import tf_keras as tfk
+
 options = HandLandmarkerOptions(
     base_options=BaseOptions(
         model_asset_path="path/to/hand_landmarker.task",
@@ -97,35 +99,18 @@ mapping_arabe = {
 @st.cache_resource
 def load_trained_model():
     try:
-        # 1. Construction du sous-modèle VGG16 exact
-        vgg_base = tf.keras.applications.VGG16(
-            include_top=False,
-            weights=None,
-            input_shape=(224, 224, 3)
-        )
-        vgg_base._name = "vgg16"
-
-        # 2. Assembled Sequential matching 'sequential_2' structure
-        model = tf.keras.models.Sequential([
-            tf.keras.layers.InputLayer(input_shape=(224, 224, 3), name="vgg16_input"),
-            vgg_base,
-            tf.keras.layers.Flatten(name="flatten_2"),
-            tf.keras.layers.Dense(200, activation='relu', name="dense_8"),
-            tf.keras.layers.Dense(100, activation='relu', name="dense_9"),
-            tf.keras.layers.Dense(31, activation='softmax', name="dense_10")
-        ], name="sequential_2")
-
-        # 3. Chargement direct des poids dans le sous-modèle VGG16 et la tête dense
-        vgg_base.load_weights('model.h5', by_name=True, skip_mismatch=True)
-        model.load_weights('model.h5', by_name=True, skip_mismatch=True)
-        
+        with open('model.json', 'r') as json_file:
+            loaded_model_json = json_file.read()
+            
+        # tf_keras restaure fidèlement les structures Keras 2 / TF 2.10
+        model = tfk.models.model_from_json(loaded_model_json)
+        model.load_weights('model.h5')
         return model
     except Exception as e:
         st.error(f"Erreur modèle : {e}")
         return None
 
 model = load_trained_model()
-
 # --- 2. TRAITEMENT ---
 
 def get_hand_crop(image_pil):
