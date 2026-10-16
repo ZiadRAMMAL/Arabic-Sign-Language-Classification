@@ -25,8 +25,6 @@ import gdown
 from mediapipe.tasks.python import BaseOptions
 from mediapipe.tasks.python.vision import HandLandmarker, HandLandmarkerOptions, RunningMode
 
-import tf_keras as tfk
-
 options = HandLandmarkerOptions(
     base_options=BaseOptions(
         model_asset_path="path/to/hand_landmarker.task",
