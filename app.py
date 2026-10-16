@@ -96,28 +96,23 @@ mapping_arabe = {
 @st.cache_resource
 def load_trained_model():
     try:
-        with open('model.json', 'r') as json_file:
-            loaded_model_json = json_file.read()
-            
-        # Classe Flatten adaptée pour dépaqueter récursivement les arguments sous forme de liste
-        class FixedFlatten(tf.keras.layers.Flatten):
-            def call(self, inputs, *args, **kwargs):
-                # Extraire le tensor sous-jacent s'il est enveloppé dans une liste ou un tuple
-                while isinstance(inputs, (list, tuple)) and len(inputs) > 0:
-                    inputs = inputs[0]
-                return super().call(inputs, *args, **kwargs)
-
-        custom_objects = {
-            'Sequential': tf.keras.models.Sequential,
-            'Functional': tf.keras.models.Model,
-            'InputLayer': tf.keras.layers.InputLayer,
-            'Conv2D': tf.keras.layers.Conv2D,
-            'MaxPooling2D': tf.keras.layers.MaxPooling2D,
-            'Flatten': FixedFlatten,
-            'Dense': tf.keras.layers.Dense
-        }
+        # Reconstitution directe du backbone VGG16
+        vgg = tf.keras.applications.VGG16(
+            include_top=False,
+            weights=None,
+            input_shape=(224, 224, 3)
+        )
         
-        model = tf.keras.models.model_from_json(loaded_model_json, custom_objects=custom_objects)
+        # Ajout du classifieur (Flatten + Dense + Dense + Dense)
+        model = tf.keras.models.Sequential([
+            vgg,
+            tf.keras.layers.Flatten(),
+            tf.keras.layers.Dense(200, activation='relu'),
+            tf.keras.layers.Dense(100, activation='relu'),
+            tf.keras.layers.Dense(31, activation='softmax')
+        ])
+        
+        # Chargement direct des poids pré-entraînés
         model.load_weights('model.h5')  
         return model
     except Exception as e:
