@@ -6,3 +6,5 @@ libxrender-dev
 libgomp1
 libprotoc-dev
 protobuf-compiler
+libegl1
+libgles2-mesa
