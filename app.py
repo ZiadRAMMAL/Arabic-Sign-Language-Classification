@@ -63,10 +63,14 @@ if 'phrase' not in st.session_state:
 # et de l'avoir placé dans le même dossier que votre script app.py.
 @st.cache_resource
 def load_detector():
-    base_options = python.BaseOptions(model_asset_path='hand_landmarker.task')
+    base_options = python.BaseOptions(
+        model_asset_path='hand_landmarker.task',
+        delegate=python.BaseOptions.Delegate.CPU  # <-- Forcer l'exécution CPU sur le serveur
+    )
     options = vision.HandLandmarkerOptions(
         base_options=base_options,
-        num_hands=1
+        num_hands=1,
+        running_mode=vision.RunningMode.IMAGE
     )
     return vision.HandLandmarker.create_from_options(options)
 
