@@ -96,35 +96,29 @@ mapping_arabe = {
 @st.cache_resource
 def load_trained_model():
     try:
-        # Reconstitution exacte de la sous-partie VGG16 (Block 3 Pool à Block 5 Pool)
-        vgg_sub = tf.keras.models.Sequential([
+        # 1. Construction du sous-modèle VGG16 exact
+        vgg_base = tf.keras.applications.VGG16(
+            include_top=False,
+            weights=None,
+            input_shape=(224, 224, 3)
+        )
+        vgg_base._name = "vgg16"
+
+        # 2. Assembled Sequential matching 'sequential_2' structure
+        model = tf.keras.models.Sequential([
             tf.keras.layers.InputLayer(input_shape=(224, 224, 3), name="vgg16_input"),
-            
-            # Bloc 3 (Pool seulement)
-            tf.keras.layers.MaxPooling2D((2, 2), strides=(2, 2), name="block3_pool"),
-            
-            # Bloc 4
-            tf.keras.layers.Conv2D(512, (3, 3), activation='relu', padding='same', name="block4_conv1"),
-            tf.keras.layers.Conv2D(512, (3, 3), activation='relu', padding='same', name="block4_conv2"),
-            tf.keras.layers.Conv2D(512, (3, 3), activation='relu', padding='same', name="block4_conv3"),
-            tf.keras.layers.MaxPooling2D((2, 2), strides=(2, 2), name="block4_pool"),
-            
-            # Bloc 5
-            tf.keras.layers.Conv2D(512, (3, 3), activation='relu', padding='same', name="block5_conv1"),
-            tf.keras.layers.Conv2D(512, (3, 3), activation='relu', padding='same', name="block5_conv2"),
-            tf.keras.layers.Conv2D(512, (3, 3), activation='relu', padding='same', name="block5_conv3"),
-            tf.keras.layers.MaxPooling2D((2, 2), strides=(2, 2), name="block5_pool"),
-            
-            # Tête de classification
+            vgg_base,
             tf.keras.layers.Flatten(name="flatten_2"),
             tf.keras.layers.Dense(200, activation='relu', name="dense_8"),
             tf.keras.layers.Dense(100, activation='relu', name="dense_9"),
             tf.keras.layers.Dense(31, activation='softmax', name="dense_10")
         ], name="sequential_2")
 
-        # Chargement des poids avec by_name=True pour mapper sur les noms de couches exacts
-        vgg_sub.load_weights('model.h5', by_name=True)
-        return vgg_sub
+        # 3. Chargement direct des poids dans le sous-modèle VGG16 et la tête dense
+        vgg_base.load_weights('model.h5', by_name=True, skip_mismatch=True)
+        model.load_weights('model.h5', by_name=True, skip_mismatch=True)
+        
+        return model
     except Exception as e:
         st.error(f"Erreur modèle : {e}")
         return None
