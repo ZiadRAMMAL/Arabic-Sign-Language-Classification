@@ -99,25 +99,30 @@ def load_trained_model():
         with open('model.json', 'r') as json_file:
             loaded_model_json = json_file.read()
             
-        # Dictionnaire d'objets personnalisés pour assurer la rétrocompatibilité Keras 2 -> Keras 3
+        # Classe Flatten personnalisée pour gérer le format d'arguments Keras 2 / Keras 3
+        class FixedFlatten(tf.keras.layers.Flatten):
+            def call(self, inputs, *args, **kwargs):
+                if isinstance(inputs, list) and len(inputs) == 1:
+                    inputs = inputs[0]
+                return super().call(inputs, *args, **kwargs)
+
         custom_objects = {
             'Sequential': tf.keras.models.Sequential,
             'Functional': tf.keras.models.Model,
             'InputLayer': tf.keras.layers.InputLayer,
             'Conv2D': tf.keras.layers.Conv2D,
             'MaxPooling2D': tf.keras.layers.MaxPooling2D,
-            'Flatten': tf.keras.layers.Flatten,
+            'Flatten': FixedFlatten,  # <-- Utilisation de notre Flatten corrigé
             'Dense': tf.keras.layers.Dense
         }
         
-        # Chargement de la structure avec les objets déclarés
         model = tf.keras.models.model_from_json(loaded_model_json, custom_objects=custom_objects)
         model.load_weights('model.h5')  
         return model
     except Exception as e:
-        # Affichage détaillé de l'erreur dans la console/UI pour faciliter le débogage
         st.error(f"Erreur modèle : {e}")
         return None
+
 model = load_trained_model()
 
 # --- 2. TRAITEMENT ---
