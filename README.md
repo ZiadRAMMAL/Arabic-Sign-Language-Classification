@@ -1,51 +1,55 @@
 # 🤟 Classification de la Langue des Signes Arabe (Deep Learning & Streamlit)
-
-Ce projet a été réalisé dans le cadre du Master 1 EEA (SIA2) à l'Université de Toulouse par **Ziad RAMMAL** et **Melissa YESGUER**.
-
-Il s'agit d'une application d'apprentissage profond permettant de reconnaître et de traduire en temps réel les lettres de l'alphabet arabe en langue des signes (31 classes).
-
+Projet réalisé dans le cadre du **Master 1 EEA (SIA2)** à l'**Université de Toulouse** par **Ziad RAMMAL** et **Melissa YESGUER**.
+Ce projet propose une application interactive capable de reconnaître et traduire les lettres de l'alphabet arabe en langue des signes (31 classes).
 ---
-
-## 🚀 Démo en ligne
-👉 **[Tester l'application Streamlit Cloud](URL_DE_VOTRE_APP_STREAMLIT)**
-
+## 📌 Architecture du projet
+Le pipeline de traitement se compose de deux étapes majeures :
+1. **Détection & Recadrage (MediaPipe Tasks)** : Utilisation du modèle `HandLandmarker` de MediaPipe pour repérer la main dans la vidéo ou l'image et effectuer un recadrage (*crop*) précis autour des repères (*landmarks*).
+2. **Classification (Transfer Learning VGG16)** : Un réseau de neurones convolutif basé sur la structure **VGG16 pré-entraînée sur ImageNet** (avec Fine-Tuning) pour classer le signe recadré parmi 31 catégories.
 ---
-
-## 📌 Architecture & Méthodologie
-
-1. **Prétraitement & Détection de la main** : Utilisation de la nouvelle API **MediaPipe Tasks** (`HandLandmarker`) pour détecter la main, calculer la boîte englobante (bounding box) et effectuer un recadrage dynamique (*crop*).
-2. **Classification (Deep Learning)** : Modèle basé sur la recherche de transfert (**VGG16 pré-entraîné sur ImageNet**) avec Fine-Tuning.
-3. **Performances** : Précision finale de **~97%** sur l'ensemble de test.
-4. **Interface utilisateur** : Déploiement sous forme d'application web interactive avec **Streamlit**.
-
+## 📁 Structure du dépôt
+```text
+.
+├── app.py                     # Code principal de l'application Streamlit
+├── hand_landmarker.task        # Modèle MediaPipe Task pour la détection des mains
+├── requirements.txt            # Dépendances pip pour le déploiement Cloud
+├── environment_train.yml       # Environnement Conda pour l'entraînement du modèle
+├── environment_app.yml         # Environnement Conda pour l'exécution de l'application
+├── docs/                       # Rapport et supports de présentation
+└── README.md                   # Documentation du projet
+```
 ---
-
-## 📁 Fichiers Lourds & Téléchargements
-
-En raison des limitations de taille de GitHub, les poids du modèle entraîné et le jeu de données complet sont hébergés sur Google Drive :
-
-- 📦 **Modèle entraîné (`model.h5` & `model.json`)** : [Télécharger le modèle sur Google Drive](LIEN_GOOGLE_DRIVE_MODELE)
-- 📊 **Dataset (ARSL-No-BackGround-V2)** : [Télécharger le jeu de données](LIEN_GOOGLE_DRIVE_DATASET)
-
-> *Remarque : Pour exécuter l'application localement, téléchargez `model.h5` et `model.json` et placez-les à la racine du projet.*
-
+## 📦 Téléchargement des fichiers lourds (Google Drive)
+En raison des limites de taille imposées par GitHub, le modèle entraîné ainsi que le jeu de données complet sont hébergés séparément :
+- 🧠 **Modèle entraîné (`model.h5` et `model.json`)** : [Télécharger le modèle sur Google Drive](https://drive.google.com/drive/folders/1oci-zhFr9BcLwQY8KcUoNtknlm9Z5Kry?usp=drive_link)
+- 📊 **Dataset (ARSL-No-BackGround-V2)** : [Télécharger le dataset](https://drive.google.com/drive/folders/1oci-zhFr9BcLwQY8KcUoNtknlm9Z5Kry?usp=drive_link)
+> **Remarque :** Pour exécuter l'application en local, téléchargez `model.h5` et `model.json` puis placez-les à la racine du projet.
 ---
-
-## 💻 Installation et Exécution Locale
-
+## 🛠️ Installation & Exécution locale
+### Option 1 : Utiliser les environnements Anaconda (Recommandé)
+Pour éviter tout conflit de versions, deux fichiers d'environnement Anaconda sont fournis :
+1. **Environnement d'entraînement** (TensorFlow, Keras, etc.) :
+   ```bash
+   conda env create -f environment_train.yml
+   conda activate tf-gpu
+   ```
+2. **Environnement d'exécution Streamlit** :
+   ```bash
+   conda env create -f environment_app.yml
+   conda activate sign_app
+   streamlit run app.py
+   ```
+---
+### Option 2 : Installation via `pip`
 ```bash
 # 1. Cloner le dépôt
-git clone [https://github.com/VOTRE_NOM_UTILISATEUR/ARSL-Classification.git](https://github.com/VOTRE_NOM_UTILISATEUR/ARSL-Classification.git)
-cd ARSL-Classification
-
-# 2. Créer un environnement virtuel
-python -m venv venv
-source venv/bin/activate  # Sur Windows : venv\Scripts\activate
-
-# 3. Installer les dépendances
+git clone https://github.com/ZiadRAMMAL/Arabic-Sign-Language-Classification.git
+cd Arabic-Sign-Language-Classification
+# 2. Installer les dépendances
 pip install -r requirements.txt
-
-# 4. Télécharger le modèle (model.h5 et model.json) depuis le lien Google Drive et les placer dans ce dossier
-
-# 5. Lancer l'application Streamlit
+# 3. Lancer l'application
 streamlit run app.py
+```
+---
+## 📜 Documentation
+Consultez le dossier `docs/` pour accéder au rapport détaillé du projet ainsi qu'aux supports de présentation.
