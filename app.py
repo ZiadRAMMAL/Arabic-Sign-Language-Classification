@@ -25,6 +25,8 @@ import gdown
 from mediapipe.tasks.python import BaseOptions
 from mediapipe.tasks.python.vision import HandLandmarker, HandLandmarkerOptions, RunningMode
 
+import tf_keras as tfk
+
 options = HandLandmarkerOptions(
     base_options=BaseOptions(
         model_asset_path="path/to/hand_landmarker.task",
@@ -98,14 +100,26 @@ def load_trained_model():
     try:
         with open('model.json', 'r') as json_file:
             loaded_model_json = json_file.read()
-        model = model_from_json(loaded_model_json)
+            
+        # Dictionnaire d'objets personnalisés pour assurer la rétrocompatibilité Keras 2 -> Keras 3
+        custom_objects = {
+            'Sequential': tf.keras.models.Sequential,
+            'Functional': tf.keras.models.Model,
+            'InputLayer': tf.keras.layers.InputLayer,
+            'Conv2D': tf.keras.layers.Conv2D,
+            'MaxPooling2D': tf.keras.layers.MaxPooling2D,
+            'Flatten': tf.keras.layers.Flatten,
+            'Dense': tf.keras.layers.Dense
+        }
+        
+        # Chargement de la structure avec les objets déclarés
+        model = tf.keras.models.model_from_json(loaded_model_json, custom_objects=custom_objects)
         model.load_weights('model.h5')  
         return model
     except Exception as e:
+        # Affichage détaillé de l'erreur dans la console/UI pour faciliter le débogage
         st.error(f"Erreur modèle : {e}")
         return None
-
-model = load_trained_model()
 
 # --- 2. TRAITEMENT ---
 
@@ -163,7 +177,7 @@ if img_file:
         col_img, col_act = st.columns([1, 1])
         
         with col_img:
-            st.image(img_display, caption="Signe détecté", use_column_width=True)
+            st.image(img_display, caption="Signe détecté", use_container_width=True)
             
         with col_act:
             if model is not None:
