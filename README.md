@@ -53,3 +53,5 @@ streamlit run app.py
 ---
 ## 📜 Documentation
 Consultez le dossier `docs/` pour accéder au rapport détaillé du projet ainsi qu'aux supports de présentation.
+
+👉 **[Accéder à l'application en ligne sur Streamlit Cloud](https://arabic-sign-language-classification-ndsm4odtfjabqqedhhxiwr.streamlit.app/)**
