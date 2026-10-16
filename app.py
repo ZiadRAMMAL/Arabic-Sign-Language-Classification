@@ -14,6 +14,7 @@ import pandas as pd
 import mediapipe as mp
 from tensorflow.keras.models import model_from_json, Sequential
 import tensorflow as tf
+from tensorflow.keras.applications.vgg16 import preprocess_input
 
 # Importation des modules pour la nouvelle API MediaPipe Tasks
 from mediapipe.tasks import python
@@ -132,7 +133,6 @@ def get_hand_crop(image_pil):
     img_bgr = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
     h, w, _ = img_bgr.shape
     
-    # Conversion de l'image pour MediaPipe Image format
     mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB))
     results = detector.detect(mp_image)
     
@@ -151,8 +151,11 @@ def get_hand_crop(image_pil):
             
             roi_resized = cv2.resize(roi, (224, 224))
             roi_rgb = cv2.cvtColor(roi_resized, cv2.COLOR_BGR2RGB)
-            img_tensor = roi_rgb.astype('float32') / 255.0
-            img_tensor = np.expand_dims(img_tensor, axis=0)
+            
+            # --- CORRECTION DE LA NORMALISATION VGG16 ---
+            # Préparation de l'image en format BGR float32 sans division par 255.0
+            img_tensor = np.expand_dims(roi_resized.astype('float32'), axis=0)
+            img_tensor = preprocess_input(img_tensor) # Soustraction de la moyenne ImageNet (BGR)
             
             return img_tensor, roi_rgb, True
     return None, None, False
